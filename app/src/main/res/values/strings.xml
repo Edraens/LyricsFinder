@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">LyricsFinder</string>
+    <string name="enter_song">Search lyrics by artist and title :</string>
+    <string name="inputArtist">Artist...</string>
+    <string name="inputTitle">Title...</string>
+    <string name="btnSearch">Find lyrics</string>
+</resources>
