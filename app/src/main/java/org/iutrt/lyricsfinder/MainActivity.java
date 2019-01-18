@@ -53,6 +53,10 @@ public class MainActivity extends AppCompatActivity {
         titleSuggestionsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, titleSuggestionsArray);
         inputTitle.setAdapter(titleSuggestionsAdapter);
 
+//        Modification de la sensibilité des AutoCompleteTextView :
+        inputArtist.setThreshold(0);
+        inputTitle.setThreshold(0);
+
 //        Création d'un textChangedListener pour les deux champs de texte afin de n'activer le bouton que si du texte a été entré (via la méthode changeButtonState) et de trigger l'autocompletion :
         inputArtist.addTextChangedListener(new TextWatcher() {
             @Override
@@ -142,8 +146,8 @@ public class MainActivity extends AppCompatActivity {
         private List<String> getArtistsFromJSON(JSONArray array) throws Exception {
             List<String> response = new ArrayList<>();
             int limit;
-            if (array.length() < 6) limit = array.length();
-            else limit = 6;
+            if (array.length() < 12) limit = array.length();
+            else limit = 12;
 
             for (int i = 0; i < limit; i++) {
                 String artist = array.getJSONObject(i).getString("name");
@@ -173,7 +177,7 @@ public class MainActivity extends AppCompatActivity {
             try {
                 HttpURLConnection connection;
                 URL url = new
-                        URL("https://api.deezer.com/search?limit=6&q=artist:%22" + URLEncoder.encode(artist, "UTF-8") + "%22+%22" + URLEncoder.encode(title, "UTF-8") + "%22");
+                        URL("https://api.deezer.com/search?limit=12&q=artist:%22" + URLEncoder.encode(artist, "UTF-8") + "%22+%22" + URLEncoder.encode(title, "UTF-8") + "%22");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 InputStream inputStream = connection.getInputStream();
