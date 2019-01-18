@@ -72,6 +72,8 @@ public class MainActivity extends AppCompatActivity {
                 }
                 artistHasText = s.length() > 0;
                 changeButtonState();
+                titleSuggestionsAdapter.clear();
+                titleSuggestionsAdapter.notifyDataSetChanged();
             }
 
             @Override
