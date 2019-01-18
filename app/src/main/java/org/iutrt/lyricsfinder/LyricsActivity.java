@@ -106,6 +106,7 @@ public class LyricsActivity extends AppCompatActivity {
             }
             else {
                 progress.setVisibility(View.GONE);
+                result = result.replaceAll("\\n\\n\\n+", "\n\n");
                 textLyrics.setText(result);
             }
         }
