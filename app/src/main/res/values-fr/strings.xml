@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LyricsFinder</string>
+    <string name="enter_song">Rechercher des paroles selon l\'artiste et le titre</string>
+    <string name="inputArtist">Artiste...</string>
+    <string name="inputTitle">Titre...</string>
+    <string name="btnSearch">Rechercher les paroles</string>
+    <string name="lyrics_404">Paroles introuvables</string>
+    <string name="internet_issue">Erreur de connectivité : êtes-vous connecté à Internet ?</string>
+</resources>

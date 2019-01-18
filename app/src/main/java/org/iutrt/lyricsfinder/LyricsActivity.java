@@ -51,6 +51,7 @@ public class LyricsActivity extends AppCompatActivity {
 
     }
 
+    @SuppressWarnings("Duplicates")
     private class Request extends AsyncTask<String, Void, String> {
         protected String doInBackground(String... song) {
             String response = request(song[0], song[1]);
