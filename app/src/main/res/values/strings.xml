@@ -4,4 +4,6 @@
     <string name="inputArtist">Artist...</string>
     <string name="inputTitle">Title...</string>
     <string name="btnSearch">Find lyrics</string>
+    <string name="lyrics_404">Lyrics not found</string>
+    <string name="internet_issue">Connectivity error : are you connected to the Internet ?</string>
 </resources>

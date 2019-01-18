@@ -4,15 +4,14 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -24,6 +23,7 @@ public class LyricsActivity extends AppCompatActivity {
     private String[] song = new String[2];
     private TextView textInfo;
     private TextView textLyrics;
+    private ProgressBar progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +32,8 @@ public class LyricsActivity extends AppCompatActivity {
 
 //        Récupération des views
         textInfo = findViewById(R.id.lyrics_textInfo);
-        textLyrics = findViewById(R.id.lyrics_textLyrics);
+        textLyrics = findViewById(R.id.lyrics_viewLyrics);
+        progress = findViewById(R.id.lyrics_progress);
 
 //        Récupération de l'intent appelé dans MainActivity, de l'artiste et du titre :
         Intent mainIntent = getIntent();
@@ -75,9 +76,13 @@ public class LyricsActivity extends AppCompatActivity {
                 }
                 JSONObject lyricsJSON = new JSONObject(response);
                 response = getLyricsFromJSON(lyricsJSON);
-            } catch (IOException e) {
-                response = "problème de connexion ";
-            } catch (Exception e) {
+            } catch (FileNotFoundException e){
+                response = "404";
+            }
+            catch (IOException e) {
+                response = "noInternet";
+            }
+            catch (Exception e) {
                 e.printStackTrace();
             }
             return response;
@@ -90,7 +95,18 @@ public class LyricsActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(String result){
-            textLyrics.setText(result);
+            if (result == "404") {
+                Toast.makeText(LyricsActivity.this, R.string.lyrics_404, Toast.LENGTH_SHORT).show();
+                LyricsActivity.this.finish();
+            }
+            else if (result == "noInternet"){
+                Toast.makeText(LyricsActivity.this, R.string.internet_issue, Toast.LENGTH_SHORT).show();
+                LyricsActivity.this.finish();
+            }
+            else {
+                progress.setVisibility(View.GONE);
+                textLyrics.setText(result);
+            }
         }
 
     }
