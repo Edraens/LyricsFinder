@@ -18,7 +18,7 @@
             app:layout_constraintVertical_bias="0.104"
             android:id="@+id/textView"/>
 
-    <EditText
+    <AutoCompleteTextView
             android:layout_width="287dp"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -31,7 +31,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             android:inputType="textCapWords"/>
 
-    <EditText
+    <AutoCompleteTextView
             android:layout_width="287dp"
             android:layout_height="wrap_content"
             android:ems="10"

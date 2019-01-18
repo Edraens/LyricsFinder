@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">LyricsFinder</string>
     <string name="enter_song">Search lyrics by artist and title :</string>
-    <string name="inputArtist">Artist...</string>
-    <string name="inputTitle">Title...</string>
+    <string name="inputArtist">Artist…</string>
+    <string name="inputTitle">Title…</string>
     <string name="btnSearch">Find lyrics</string>
-    <string name="lyrics_404">Lyrics not found</string>
+    <string name="lyrics_404">Unable to find lyrics for this song</string>
     <string name="internet_issue">Connectivity error : are you connected to the Internet ?</string>
 </resources>

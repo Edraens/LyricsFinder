@@ -8,7 +8,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -18,10 +17,7 @@ import java.net.URLEncoder;
 
 public class LyricsActivity extends AppCompatActivity {
 
-    private String artist;
-    private String title;
     private String[] song = new String[2];
-    private TextView textInfo;
     private TextView textLyrics;
     private ProgressBar progress;
 
@@ -31,14 +27,15 @@ public class LyricsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lyrics);
 
 //        Récupération des views
-        textInfo = findViewById(R.id.lyrics_textInfo);
+        TextView textInfo = findViewById(R.id.lyrics_textInfo);
         textLyrics = findViewById(R.id.lyrics_viewLyrics);
         progress = findViewById(R.id.lyrics_progress);
 
+//        Ajout du bouton "back" dans l'ActionBar :
 //        Récupération de l'intent appelé dans MainActivity, de l'artiste et du titre :
         Intent mainIntent = getIntent();
-        artist = mainIntent.getStringExtra("artist");
-        title = mainIntent.getStringExtra("title");
+        String artist = mainIntent.getStringExtra("artist");
+        String title = mainIntent.getStringExtra("title");
         song[0] = artist;
         song[1] = title;
 
@@ -51,17 +48,17 @@ public class LyricsActivity extends AppCompatActivity {
 
     }
 
+    @SuppressWarnings("Duplicates")
     private class Request extends AsyncTask<String, Void, String> {
         protected String doInBackground(String... song) {
-            String response = request(song[0], song[1]);
-            return response;
+            return request(song[0], song[1]);
         }
 
-        protected String request(String artist, String title) {
-            String response = "";
+        String request(String artist, String title) {
+            StringBuilder response = new StringBuilder();
 
             try {
-                HttpURLConnection connection = null;
+                HttpURLConnection connection;
                 URL url = new
                         URL("https://api.lyrics.ovh/v1/" + URLEncoder.encode(artist, "UTF-8") + "/" + URLEncoder.encode(title, "UTF-8"));
                 connection = (HttpURLConnection) url.openConnection();
@@ -71,40 +68,41 @@ public class LyricsActivity extends AppCompatActivity {
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
                 String ligne = bufferedReader.readLine();
                 while (ligne != null) {
-                    response += ligne;
+                    response.append(ligne);
                     ligne = bufferedReader.readLine();
                 }
-                JSONObject lyricsJSON = new JSONObject(response);
-                response = getLyricsFromJSON(lyricsJSON);
+                JSONObject lyricsJSON = new JSONObject(response.toString());
+                response = new StringBuilder(getLyricsFromJSON(lyricsJSON));
             } catch (FileNotFoundException e){
-                response = "404";
+                response = new StringBuilder("404");
             }
             catch (IOException e) {
-                response = "noInternet";
+                response = new StringBuilder("noInternet");
             }
             catch (Exception e) {
                 e.printStackTrace();
             }
-            return response;
+            return response.toString();
         }
 
         private String getLyricsFromJSON(JSONObject jso) throws Exception {
-            String response = "";
+            String response;
             response = jso.getString("lyrics");
             return response;
         }
 
         protected void onPostExecute(String result){
-            if (result == "404") {
+            if (result.equals("404")) {
                 Toast.makeText(LyricsActivity.this, R.string.lyrics_404, Toast.LENGTH_SHORT).show();
                 LyricsActivity.this.finish();
             }
-            else if (result == "noInternet"){
+            else if (result.equals("noInternet")){
                 Toast.makeText(LyricsActivity.this, R.string.internet_issue, Toast.LENGTH_SHORT).show();
                 LyricsActivity.this.finish();
             }
             else {
                 progress.setVisibility(View.GONE);
+                result = result.replaceAll("\\n\\n\\n+", "\n\n");
                 textLyrics.setText(result);
             }
         }
