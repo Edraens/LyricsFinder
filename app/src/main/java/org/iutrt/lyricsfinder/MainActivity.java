@@ -18,8 +18,6 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
     private Button btnSearch;
     private boolean artistHasText = false;
     private boolean titleHasText = false;
+    private ArrayAdapter<String> artistSuggestionsAdapter;
+    private ArrayAdapter<String> titleSuggestionsAdapter;
+    private ArrayList<String> artistSuggestionsArray = new ArrayList<>();
+    private ArrayList<String> titleSuggestionsArray = new ArrayList<>();
 
     @SuppressWarnings("Duplicates")
     @Override
@@ -44,6 +46,13 @@ public class MainActivity extends AppCompatActivity {
         btnSearch.setEnabled(false);
         inputArtist.requestFocus();
 
+//        Création des ArrayAdapter pour les suggestions :
+        artistSuggestionsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, artistSuggestionsArray);
+        inputArtist.setAdapter(artistSuggestionsAdapter);
+
+        titleSuggestionsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, titleSuggestionsArray);
+        inputTitle.setAdapter(titleSuggestionsAdapter);
+
 //        Création d'un textChangedListener pour les deux champs de texte afin de n'activer le bouton que si du texte a été entré (via la méthode changeButtonState) et de trigger l'autocompletion :
         inputArtist.addTextChangedListener(new TextWatcher() {
             @Override
@@ -53,19 +62,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 3) {
+                if (s.length() > 2) {
                     RequestArtist req = new RequestArtist();
-                    try {
-                        List<String> artists = req.execute(inputArtist.getText().toString()).get(1500, TimeUnit.MILLISECONDS);
-                        String[] artistsArray = new String[artists.size()];
-                        artistsArray = artists.toArray(artistsArray);
-                        inputArtist.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, artistsArray));
-                    } catch (Exception e) {
-                        Log.v("Autocomplete", "Nothing found");
-                    }
+                    req.execute(inputArtist.getText().toString());
                 }
-                if (s.length() > 0) artistHasText = true;
-                else artistHasText = false;
+                artistHasText = s.length() > 0;
                 changeButtonState();
             }
 
@@ -83,21 +84,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() > 1 && artistHasText) {
+                if (s.length() >= 1 && artistHasText) {
                     RequestTitle req = new RequestTitle();
-                    try {
-                        String[] data = new String[]{inputTitle.getText().toString(), inputArtist.getText().toString()};
-                        List<String> titles = req.execute(data).get(1500, TimeUnit.MILLISECONDS);
-                        String[] titlesArray = new String[titles.size()];
-                        titlesArray = titles.toArray(titlesArray);
-
-                        inputTitle.setAdapter(new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, titlesArray));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    req.execute(inputTitle.getText().toString(), inputArtist.getText().toString());
                 }
-                if (s.length() > 0) titleHasText = true;
-                else titleHasText = false;
+                titleHasText = s.length() > 0;
                 changeButtonState();
             }
 
@@ -115,17 +106,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @SuppressWarnings("Duplicates")
-    private static class RequestArtist extends AsyncTask<String, Void, List<String>> {
+    private class RequestArtist extends AsyncTask<String, Void, List<String>> {
         protected List<String> doInBackground(String... artist) {
-            List<String> response = request(artist[0]);
-            return response;
+            return request(artist[0]);
         }
 
-        protected List<String> request(String artist) {
-            List<String> response = new ArrayList<String>();
+        List<String> request(String artist) {
+            List<String> response = new ArrayList<>();
 
             try {
-                HttpURLConnection connection = null;
+                HttpURLConnection connection;
                 URL url = new
                         URL("http://musicbrainz.org/ws/2/artist/?fmt=json&query=" + URLEncoder.encode(artist, "UTF-8"));
                 connection = (HttpURLConnection) url.openConnection();
@@ -133,13 +123,13 @@ public class MainActivity extends AppCompatActivity {
                 InputStream inputStream = connection.getInputStream();
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String rawJson = "";
+                StringBuilder rawJson = new StringBuilder();
                 String ligne = bufferedReader.readLine();
                 while (ligne != null) {
-                    rawJson += ligne;
+                    rawJson.append(ligne);
                     ligne = bufferedReader.readLine();
                 }
-                JSONObject responseJSON = new JSONObject(rawJson);
+                JSONObject responseJSON = new JSONObject(rawJson.toString());
 //                JSONArray arrayArtistsJSON = new JSONArray(responseJSON.getJSONArray("artists"));
                 JSONArray arrayArtistsJSON = (JSONArray) responseJSON.get("artists");
                 response = getArtistsFromJSON(arrayArtistsJSON);
@@ -150,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private List<String> getArtistsFromJSON(JSONArray array) throws Exception {
-            List<String> response = new ArrayList<String>();
+            List<String> response = new ArrayList<>();
             int limit;
             if (array.length() < 6) limit = array.length();
             else limit = 6;
@@ -159,25 +149,29 @@ public class MainActivity extends AppCompatActivity {
                 String artist = array.getJSONObject(i).getString("name");
                 if (!response.contains(artist)) {
                     response.add(artist);
-                }
-                else Log.i("AVOID DUPLICATE ARTIST", artist);
+                } else Log.i("AVOID DUPLICATE ARTIST", artist);
             }
             return response;
+        }
+
+        protected void onPostExecute(List<String> result) {
+            artistSuggestionsAdapter.clear();
+            artistSuggestionsAdapter.addAll(result);
+            artistSuggestionsAdapter.notifyDataSetChanged();
         }
     }
 
     @SuppressWarnings("Duplicates")
-    private static class RequestTitle extends AsyncTask<String, Void, List<String>> {
+    private class RequestTitle extends AsyncTask<String, Void, List<String>> {
         protected List<String> doInBackground(String... title) {
-            List<String> response = request(title[0], title[1]);
-            return response;
+            return request(title[0], title[1]);
         }
 
-        protected List<String> request(String title, String artist) {
-            List<String> response = new ArrayList<String>();
+        List<String> request(String title, String artist) {
+            List<String> response = new ArrayList<>();
 
             try {
-                HttpURLConnection connection = null;
+                HttpURLConnection connection;
                 URL url = new
                         URL("https://api.deezer.com/search?limit=6&q=artist:%22" + URLEncoder.encode(artist, "UTF-8") + "%22+%22" + URLEncoder.encode(title, "UTF-8") + "%22");
                 connection = (HttpURLConnection) url.openConnection();
@@ -185,13 +179,13 @@ public class MainActivity extends AppCompatActivity {
                 InputStream inputStream = connection.getInputStream();
                 InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
                 BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String rawJson = "";
+                StringBuilder rawJson = new StringBuilder();
                 String ligne = bufferedReader.readLine();
                 while (ligne != null) {
-                    rawJson += ligne;
+                    rawJson.append(ligne);
                     ligne = bufferedReader.readLine();
                 }
-                JSONObject responseJSON = new JSONObject(rawJson);
+                JSONObject responseJSON = new JSONObject(rawJson.toString());
                 JSONArray arrayTitleJSON = (JSONArray) responseJSON.get("data");
                 response = getTitlesFromJSON(arrayTitleJSON);
             } catch (Exception e) {
@@ -202,16 +196,24 @@ public class MainActivity extends AppCompatActivity {
         }
 
         private List<String> getTitlesFromJSON(JSONArray array) throws Exception {
-            List<String> response = new ArrayList<String>();
+            List<String> response = new ArrayList<>();
             for (int i = 0; i < array.length(); i++) {
                 String title = array.getJSONObject(i).getString("title_short");
                 if (!response.contains(title)) {
                     response.add(title);
-                }
-                else Log.i("AVOID DUPLICATE TITLE", title);
+                    Log.i("New title", title);
+                } else Log.i("AVOID DUPLICATE TITLE", title);
             }
             return response;
         }
+
+        protected void onPostExecute(List<String> result) {
+            titleSuggestionsAdapter.clear();
+            titleSuggestionsAdapter.addAll(result);
+            titleSuggestionsAdapter.notifyDataSetChanged();
+
+        }
+
     }
 
     protected void btnClick(View v) {

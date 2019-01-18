@@ -5,6 +5,6 @@
     <string name="inputArtist">Artiste...</string>
     <string name="inputTitle">Titre...</string>
     <string name="btnSearch">Rechercher les paroles</string>
-    <string name="lyrics_404">Paroles introuvables</string>
+    <string name="lyrics_404">Impossible de trouver les paroles de ce titre</string>
     <string name="internet_issue">Erreur de connectivité : êtes-vous connecté à Internet ?</string>
 </resources>
