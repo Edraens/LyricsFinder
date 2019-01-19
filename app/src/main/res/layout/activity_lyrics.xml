@@ -7,35 +7,19 @@
         android:layout_height="match_parent"
         tools:context=".LyricsActivity">
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/lyrics_textInfo"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toTopOf="parent"
-            android:textColor="@android:color/black"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent" app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintEnd_toEndOf="parent"/>
 
     <ScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/lyrics_textInfo" android:id="@+id/lyrics_scrollLyrics"
-            android:scrollbarStyle="insideOverlay" android:layout_marginEnd="8dp"
-            app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="15dp" android:layout_marginTop="60dp" app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="16dp">
+            android:layout_height="match_parent" android:id="@+id/lyrics_scrollLyrics"
+            android:scrollbarStyle="insideOverlay"
+            android:fillViewport="true">
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                      android:orientation="vertical"
-                      android:layout_marginBottom="10dp"
-                      android:paddingBottom="20dp">
+                      android:orientation="vertical">
             <TextView
                     android:textColor="@android:color/black"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" android:id="@+id/lyrics_viewLyrics"
-                    android:layout_marginBottom="20dp"
-                    android:paddingBottom="20dp"
+                    android:padding="10dp"
             />
         </LinearLayout>
     </ScrollView>

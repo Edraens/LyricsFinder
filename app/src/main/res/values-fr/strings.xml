@@ -2,9 +2,18 @@
 <resources>
     <string name="app_name">LyricsFinder</string>
     <string name="enter_song">Rechercher des paroles selon l\'artiste et le titre</string>
-    <string name="inputArtist">Artiste...</string>
-    <string name="inputTitle">Titre...</string>
+    <string name="inputArtist">Artiste…</string>
+    <string name="inputTitle">Titre…</string>
     <string name="btnSearch">Rechercher les paroles</string>
     <string name="lyrics_404">Impossible de trouver les paroles de ce titre</string>
     <string name="internet_issue">Erreur de connectivité : êtes-vous connecté à Internet ?</string>
+    <string name="favorites">Favoris</string>
+    <string name="history">Historique</string>
+    <string name="settings">Paramètres</string>
+    <string name="settings_appearance">Apparence</string>
+    <string name="settings_font_size">Taille du texte</string>
+    <string name="settings_font_size_desc">Change la taille des paroles</string>
+    <string name="small_font">Petit</string>
+    <string name="medium_font">Moyen</string>
+    <string name="large_font">Grand</string>
 </resources>

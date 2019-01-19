@@ -1,9 +1,13 @@
 package org.edraens.lyricsfinder;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -27,11 +31,15 @@ public class LyricsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_lyrics);
 
 //        Récupération des views
-        TextView textInfo = findViewById(R.id.lyrics_textInfo);
         textLyrics = findViewById(R.id.lyrics_viewLyrics);
         progress = findViewById(R.id.lyrics_progress);
 
 //        Ajout du bouton "back" dans l'ActionBar :
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(true);
+
+
+
 //        Récupération de l'intent appelé dans MainActivity, de l'artiste et du titre :
         Intent mainIntent = getIntent();
         String artist = mainIntent.getStringExtra("artist");
@@ -40,7 +48,13 @@ public class LyricsActivity extends AppCompatActivity {
         song[1] = title;
 
 //        Affichage de l'artiste et du titre dans l'activité :
-        textInfo.setText(artist + " - " + title);
+        setTitle(title + " - " + artist);
+
+//        Modification de la taille des paroles en fonction des paramètres :
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String size = prefs.getString("fontSize", "Medium");
+        textLyrics.setTextSize(TypedValue.COMPLEX_UNIT_SP, Float.parseFloat(size));
+
 
 //        Récupération des lyrics auprès de l'API lyrics.ovh via une tâche asynchrone :
         Request req = new Request();

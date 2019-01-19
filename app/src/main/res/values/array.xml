@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="fontSize">
+        <item>@string/small_font</item>
+        <item>@string/medium_font</item>
+        <item>@string/large_font</item>
+    </string-array>
+    <string-array name="fontSizeValues">
+        <item>14</item>
+        <item>18</item>
+        <item>22</item>
+    </string-array>
+</resources>
