@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("org.iutrt.lyricsfinder", appContext.getPackageName());
+        assertEquals("org.iutrt.org.edraens.lyricsfinder", appContext.getPackageName());
     }
 }

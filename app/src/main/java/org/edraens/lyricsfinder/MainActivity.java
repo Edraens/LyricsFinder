@@ -1,4 +1,4 @@
-package org.iutrt.lyricsfinder;
+package org.edraens.lyricsfinder;
 
 import android.content.Intent;
 import android.os.AsyncTask;
