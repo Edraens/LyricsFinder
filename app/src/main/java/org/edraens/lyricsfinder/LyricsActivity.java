@@ -51,7 +51,7 @@ public class LyricsActivity extends AppCompatActivity {
         song[1] = title;
 
 //        Affichage de l'artiste et du titre dans l'activité :
-        setTitle(title + " - " + artist);
+        setTitle(artist + " - " + title);
 
 //        Modification de la taille des paroles en fonction des paramètres :
         prefs = PreferenceManager.getDefaultSharedPreferences(this);
@@ -66,7 +66,6 @@ public class LyricsActivity extends AppCompatActivity {
 
     @SuppressWarnings("Duplicates")
     private void appendHistory() {
-        Toast.makeText(this, "adding to hist", Toast.LENGTH_SHORT).show();
         JSONArray history_artists;
         try {
             String raw = prefs.getString("history_artists", "");

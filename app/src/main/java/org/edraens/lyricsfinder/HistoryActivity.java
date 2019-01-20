@@ -1,5 +1,6 @@
 package org.edraens.lyricsfinder;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
@@ -73,12 +74,28 @@ public class HistoryActivity extends AppCompatActivity {
                     TextView text1 = view.findViewById(android.R.id.text1);
 
                     text1.setText(listHistoryArrayArtists.get(listHistoryArrayArtists.size()-position-1) + " - " + listHistoryArrayTitles.get(listHistoryArrayTitles.size()-position-1));
-//                text2.setText(listHistoryArray.get(position)[1]);
                     return view;
                 }
             };
 
             listHistory.setAdapter(adapterHistory);
+
+//            Ajout d'un onClickListener pour rendre la ListView clickable
+            listHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                    Récupération de l'artiste et du titre associés à l'élément de l'historique
+                    String artist = listHistoryArrayArtists.get(listHistoryArrayArtists.size()-position-1);
+                    String title = listHistoryArrayTitles.get(listHistoryArrayTitles.size()-position-1);
+//                    Création de l'intent et envoi vers LyricsActivity
+                    Intent lyricsActivity = new Intent(HistoryActivity.this, LyricsActivity.class);
+                    lyricsActivity.putExtra("artist", artist);
+                    lyricsActivity.putExtra("title", title);
+                    finish();
+                    startActivity(lyricsActivity);
+                }
+            });
+
         }
     }
 }
