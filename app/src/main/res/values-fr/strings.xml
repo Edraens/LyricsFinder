@@ -12,8 +12,12 @@
     <string name="settings">Paramètres</string>
     <string name="settings_appearance">Apparence</string>
     <string name="settings_font_size">Taille du texte</string>
-    <string name="settings_font_size_desc">Change la taille des paroles</string>
+    <string name="settings_font_size_desc">Change la taille du texte des paroles</string>
     <string name="small_font">Petit</string>
     <string name="medium_font">Moyen</string>
     <string name="large_font">Grand</string>
+    <string name="settings_privacy">Vie privée</string>
+    <string name="settings_history">Enregistrer recherches dans l\'historique</string>
+    <string name="settings_history_desc">Désactivez pour garder vos recherches privées</string>
+    <string name="empty_history">L\'historique de recherche est vide</string>
 </resources>

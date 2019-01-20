@@ -7,11 +7,14 @@ import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.*;
@@ -24,6 +27,7 @@ public class LyricsActivity extends AppCompatActivity {
     private String[] song = new String[2];
     private TextView textLyrics;
     private ProgressBar progress;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +40,8 @@ public class LyricsActivity extends AppCompatActivity {
 
 //        Ajout du bouton "back" dans l'ActionBar :
         ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
         actionBar.setHomeButtonEnabled(true);
-
-
 
 //        Récupération de l'intent appelé dans MainActivity, de l'artiste et du titre :
         Intent mainIntent = getIntent();
@@ -51,15 +54,44 @@ public class LyricsActivity extends AppCompatActivity {
         setTitle(title + " - " + artist);
 
 //        Modification de la taille des paroles en fonction des paramètres :
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String size = prefs.getString("fontSize", "Medium");
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String size = prefs.getString("fontSize", "14");
         textLyrics.setTextSize(TypedValue.COMPLEX_UNIT_SP, Float.parseFloat(size));
-
 
 //        Récupération des lyrics auprès de l'API lyrics.ovh via une tâche asynchrone :
         Request req = new Request();
         req.execute(song);
 
+    }
+
+    @SuppressWarnings("Duplicates")
+    private void appendHistory() {
+//        Vérification de l'activation de l'historique par l'utilisateur
+        if (prefs.getBoolean("historyEnabled", true)) {
+            JSONArray history_artists;
+            try {
+                String raw = prefs.getString("history_artists", "");
+                if (raw.equals("")) history_artists = new JSONArray();
+                else history_artists = new JSONArray(raw);
+                history_artists.put(song[0]);
+                prefs.edit().putString("history_artists", history_artists.toString()).apply();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e("History error", "Cannot parse history");
+            }
+            JSONArray history_titles;
+            try {
+                String raw = prefs.getString("history_titles", "");
+                if (raw.equals("")) history_titles = new JSONArray();
+                else history_titles = new JSONArray(raw);
+                history_titles.put(song[1]);
+                prefs.edit().putString("history_titles", history_titles.toString()).apply();
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.e("History error", "Cannot parse history");
+            }
+        }
+//        TODO : Ne pas ajouter à l'historique deux fois la même chanson à la suite (check si déjà ajouté juste avant, genre requête en double)
     }
 
     @SuppressWarnings("Duplicates")
@@ -87,13 +119,11 @@ public class LyricsActivity extends AppCompatActivity {
                 }
                 JSONObject lyricsJSON = new JSONObject(response.toString());
                 response = new StringBuilder(getLyricsFromJSON(lyricsJSON));
-            } catch (FileNotFoundException e){
+            } catch (FileNotFoundException e) {
                 response = new StringBuilder("404");
-            }
-            catch (IOException e) {
+            } catch (IOException e) {
                 response = new StringBuilder("noInternet");
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
             return response.toString();
@@ -105,19 +135,18 @@ public class LyricsActivity extends AppCompatActivity {
             return response;
         }
 
-        protected void onPostExecute(String result){
+        protected void onPostExecute(String result) {
             if (result.equals("404")) {
                 Toast.makeText(LyricsActivity.this, R.string.lyrics_404, Toast.LENGTH_SHORT).show();
                 LyricsActivity.this.finish();
-            }
-            else if (result.equals("noInternet")){
+            } else if (result.equals("noInternet")) {
                 Toast.makeText(LyricsActivity.this, R.string.internet_issue, Toast.LENGTH_SHORT).show();
                 LyricsActivity.this.finish();
-            }
-            else {
+            } else {
                 progress.setVisibility(View.GONE);
                 result = result.replaceAll("\\n\\n\\n+", "\n\n");
                 textLyrics.setText(result);
+                appendHistory();
             }
         }
 

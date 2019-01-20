@@ -1,4 +1,14 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory
+            android:title="@string/settings_privacy">
+
+        <SwitchPreference
+                android:key="historyEnabled"
+                android:defaultValue="true"
+                android:title="@string/settings_history"
+                android:summary="@string/settings_history_desc"
+        />
+    </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_appearance">
         <ListPreference
                 android:key="fontSize"

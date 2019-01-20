@@ -15,5 +15,9 @@
     <string name="small_font">Small</string>
     <string name="medium_font">Medium</string>
     <string name="large_font">Large</string>
+    <string name="settings_privacy">Privacy</string>
+    <string name="settings_history">Save searches to history</string>
+    <string name="settings_history_desc">Disable this to keep your searches private</string>
+    <string name="empty_history">Search history is empty</string>
 
 </resources>
