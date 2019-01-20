@@ -125,7 +125,8 @@ public class LyricsActivity extends AppCompatActivity {
             try {
                 HttpURLConnection connection;
                 URL url = new
-                        URL("https://api.lyrics.ovh/v1/" + URLEncoder.encode(artist, "UTF-8") + "/" + URLEncoder.encode(title, "UTF-8"));
+//                        On retire les quote de l'URL sinon l'API ne renvoie rien
+                        URL("https://api.lyrics.ovh/v1/" + URLEncoder.encode(artist.replace("'", " "), "UTF-8") + "/" + URLEncoder.encode(title.replace("'", " "), "UTF-8"));
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod("GET");
                 InputStream inputStream = connection.getInputStream();
