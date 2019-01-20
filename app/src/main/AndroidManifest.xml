@@ -30,6 +30,9 @@
                 android:name=".HistoryActivity"
                 android:parentActivityName=".MainActivity">
         </activity>
+        <activity android:name=".FavoritesActivity"
+                  android:parentActivityName=".MainActivity">
+        </activity>
     </application>
 
 </manifest>

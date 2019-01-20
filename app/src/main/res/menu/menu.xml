@@ -2,7 +2,7 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
     <item
-            android:id="@+id/menu_favorites" android:icon="@drawable/ic_bookmarks"
+            android:id="@+id/menu_favorites" android:icon="@drawable/ic_bookmarks_list"
             app:showAsAction="ifRoom" android:title="@string/favorites"/>
     <item
             android:id="@+id/menu_history" app:showAsAction="never" android:title="@string/history">

@@ -242,11 +242,13 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_favorites:
-                return (true);
             case R.id.menu_history:
                 Intent historyActivity = new Intent(this, HistoryActivity.class);
                 startActivity(historyActivity);
+                return (true);
+            case R.id.menu_favorites:
+                Intent favoritesActivity = new Intent(this, FavoritesActivity.class);
+                startActivity(favoritesActivity);
                 return (true);
             case R.id.menu_settings:
                 Intent settingsActivity = new Intent(this, SettingsActivity.class);

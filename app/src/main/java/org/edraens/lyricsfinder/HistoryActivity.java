@@ -29,7 +29,6 @@ public class HistoryActivity extends AppCompatActivity {
 
 //        Ajout du bouton "back" dans l'ActionBar :
         ActionBar actionBar = getSupportActionBar();
-        assert actionBar != null;
         actionBar.setHomeButtonEnabled(true);
         setTitle(R.string.history);
 
@@ -129,6 +128,9 @@ public class HistoryActivity extends AppCompatActivity {
                 finish();
                 Toast.makeText(this, R.string.cleared_history_notification, Toast.LENGTH_SHORT).show();
                 return (true);
+            case android.R.id.home:
+                finish();
+                return true;
         }
         return true;
     }

@@ -21,5 +21,10 @@
     <string name="empty_history">Search history is empty</string>
     <string name="clear_history">Clear history</string>
     <string name="cleared_history_notification">History has been cleared</string>
+    <string name="empty_favorites">No favorites, add favorites to access lyrics while offline</string>
+    <string name="favs_add">Add to favorites</string>
+    <string name="favs_del">Remove from favorites</string>
+    <string name="favs_add_notification">Added to favorites</string>
+    <string name="favs_del_notification">Removed from favorites</string>
 
 </resources>

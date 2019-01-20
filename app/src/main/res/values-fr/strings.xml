@@ -22,5 +22,11 @@
     <string name="empty_history">L\'historique de recherche est vide</string>
     <string name="clear_history">Vider l\'historique</string>
     <string name="cleared_history_notification">L\'historique a été vidé</string>
+    <string name="empty_favorites">Aucun favori, ajoutez un titre en favori pour le consulter hors-ligne</string>
+    <string name="favs_add">Ajouter aux favoris</string>
+    <string name="favs_del">Retirer des favoris</string>
+    <string name="favs_add_notification">Ajouté aux favoris</string>
+    <string name="favs_del_notification">Retiré des favoris</string>
+
 
 </resources>
