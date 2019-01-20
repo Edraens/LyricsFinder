@@ -7,8 +7,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.*;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +18,7 @@ public class HistoryActivity extends AppCompatActivity {
 
     private ArrayList<String> listHistoryArrayArtists;
     private ArrayList<String> listHistoryArrayTitles;
+    private boolean historyIsEmpty;
 
     @Override
     @SuppressWarnings("Duplicates")
@@ -42,6 +42,7 @@ public class HistoryActivity extends AppCompatActivity {
         if (!prefs.contains("history_artists")) {
             listHistory.setVisibility(View.GONE);
             textEmptyHistory.setVisibility(View.VISIBLE);
+            historyIsEmpty = true;
         } else {
 //            Récupération de l'historique des artistes
             try {
@@ -96,6 +97,40 @@ public class HistoryActivity extends AppCompatActivity {
                 }
             });
 
+            historyIsEmpty = false;
         }
     }
+
+//    Affichage du bouton de suppression si l'historique n'est pas vide
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem btnClearHistory = menu.findItem(R.id.menuhistory_clear);
+        if (!historyIsEmpty) btnClearHistory.setVisible(true);
+        return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_history, menu);
+        return true;
+    }
+
+    @SuppressWarnings("Duplicates")
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menuhistory_clear:
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+                prefs.edit().remove("history_artists").apply();
+                prefs.edit().remove("history_titles").apply();
+                finish();
+                Toast.makeText(this, R.string.cleared_history_notification, Toast.LENGTH_SHORT).show();
+                return (true);
+        }
+        return true;
+    }
+
 }

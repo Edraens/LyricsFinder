@@ -19,5 +19,7 @@
     <string name="settings_history">Save searches to history</string>
     <string name="settings_history_desc">Disable this to keep your searches private</string>
     <string name="empty_history">Search history is empty</string>
+    <string name="clear_history">Clear history</string>
+    <string name="cleared_history_notification">History has been cleared</string>
 
 </resources>

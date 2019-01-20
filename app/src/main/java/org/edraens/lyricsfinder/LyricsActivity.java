@@ -51,7 +51,7 @@ public class LyricsActivity extends AppCompatActivity {
         song[1] = title;
 
 //        Affichage de l'artiste et du titre dans l'activité :
-        setTitle(artist + " - " + title);
+        setTitle(title);
 
 //        Modification de la taille des paroles en fonction des paramètres :
         prefs = PreferenceManager.getDefaultSharedPreferences(this);

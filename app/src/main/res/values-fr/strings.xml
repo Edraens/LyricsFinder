@@ -20,4 +20,7 @@
     <string name="settings_history">Enregistrer recherches dans l\'historique</string>
     <string name="settings_history_desc">Désactivez pour garder vos recherches privées</string>
     <string name="empty_history">L\'historique de recherche est vide</string>
+    <string name="clear_history">Vider l\'historique</string>
+    <string name="cleared_history_notification">L\'historique a été vidé</string>
+
 </resources>
