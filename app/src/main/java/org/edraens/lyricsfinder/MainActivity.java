@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -158,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                 String artist = array.getJSONObject(i).getString("name");
                 if (!response.contains(artist)) {
                     response.add(artist);
-                } else Log.i("AVOID DUPLICATE ARTIST", artist);
+                }
             }
             return response;
         }
@@ -210,8 +209,7 @@ public class MainActivity extends AppCompatActivity {
                 String title = array.getJSONObject(i).getString("title_short");
                 if (!response.contains(title)) {
                     response.add(title);
-                    Log.i("New title", title);
-                } else Log.i("AVOID DUPLICATE TITLE", title);
+                }
             }
             return response;
         }

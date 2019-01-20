@@ -66,32 +66,29 @@ public class LyricsActivity extends AppCompatActivity {
 
     @SuppressWarnings("Duplicates")
     private void appendHistory() {
-//        Vérification de l'activation de l'historique par l'utilisateur
-        if (prefs.getBoolean("historyEnabled", true)) {
-            JSONArray history_artists;
-            try {
-                String raw = prefs.getString("history_artists", "");
-                if (raw.equals("")) history_artists = new JSONArray();
-                else history_artists = new JSONArray(raw);
+        Toast.makeText(this, "adding to hist", Toast.LENGTH_SHORT).show();
+        JSONArray history_artists;
+        try {
+            String raw = prefs.getString("history_artists", "");
+            if (raw.equals("")) history_artists = new JSONArray();
+            else history_artists = new JSONArray(raw);
                 history_artists.put(song[0]);
                 prefs.edit().putString("history_artists", history_artists.toString()).apply();
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("History error", "Cannot parse history");
-            }
-            JSONArray history_titles;
-            try {
-                String raw = prefs.getString("history_titles", "");
-                if (raw.equals("")) history_titles = new JSONArray();
-                else history_titles = new JSONArray(raw);
-                history_titles.put(song[1]);
-                prefs.edit().putString("history_titles", history_titles.toString()).apply();
-            } catch (JSONException e) {
-                e.printStackTrace();
-                Log.e("History error", "Cannot parse history");
-            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("History error", "Cannot parse history");
         }
-//        TODO : Ne pas ajouter à l'historique deux fois la même chanson à la suite (check si déjà ajouté juste avant, genre requête en double)
+        JSONArray history_titles;
+        try {
+            String raw = prefs.getString("history_titles", "");
+            if (raw.equals("")) history_titles = new JSONArray();
+            else history_titles = new JSONArray(raw);
+            history_titles.put(song[1]);
+            prefs.edit().putString("history_titles", history_titles.toString()).apply();
+        } catch (JSONException e) {
+            e.printStackTrace();
+            Log.e("History error", "Cannot parse history");
+        }
     }
 
     @SuppressWarnings("Duplicates")
@@ -146,7 +143,29 @@ public class LyricsActivity extends AppCompatActivity {
                 progress.setVisibility(View.GONE);
                 result = result.replaceAll("\\n\\n\\n+", "\n\n");
                 textLyrics.setText(result);
-                appendHistory();
+
+//                Si l'historique est activé, on ajoute le titre :
+                if (prefs.getBoolean("historyEnabled", true)) {
+//                Si le titre est déjà la dernière entrée dans l'historique, on ajoute pas
+                    String rawArtists = prefs.getString("history_artists", "");
+                    String rawTitles = prefs.getString("history_titles", "");
+                    if (rawArtists.equals("") || rawTitles.equals("")) {
+                        appendHistory();
+                    } else {
+                        try {
+//                        Récupération de l'historique
+                            JSONArray history_artists = new JSONArray(rawArtists);
+                            JSONArray history_titles = new JSONArray(rawTitles);
+//                        Si le dernier titre de l'historique n'est pas celui qu'on voit actuellement, alors on l'ajoute. Sinon on fait rien.
+                            if (!(history_artists.get(history_artists.length() - 1).equals(song[0]) && history_titles.get(history_titles.length() - 1).equals(song[1]))) {
+                                appendHistory();
+                            }
+                        } catch (JSONException e) {
+                            Log.e("JSON", "JSON parse error");
+                            e.printStackTrace();
+                        }
+                    }
+                }
             }
         }
 
