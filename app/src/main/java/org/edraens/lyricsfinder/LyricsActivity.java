@@ -181,7 +181,7 @@ public class LyricsActivity extends AppCompatActivity {
                             JSONArray history_artists = new JSONArray(rawArtists);
                             JSONArray history_titles = new JSONArray(rawTitles);
 //                        Si le dernier titre de l'historique n'est pas celui qu'on voit actuellement et n'est pas en favoris, alors on l'ajoute. Sinon on fait rien.
-                            if (!(history_artists.get(history_artists.length() - 1).equals(song[0]) && history_titles.get(history_titles.length() - 1).equals(song[1]))) {
+                            if (!(history_artists.getString(history_artists.length() - 1).equalsIgnoreCase(song[0]) && history_titles.getString(history_titles.length() - 1).equalsIgnoreCase(song[1]))) {
                                 if (!inFavs) appendHistory();
                             }
                         } catch (JSONException e) {
@@ -334,9 +334,9 @@ public class LyricsActivity extends AppCompatActivity {
                 for (int i = 0; i < fav_artists.length(); i++) {
                     Log.d("Loop", String.valueOf(i));
                     Log.d("MATCHLOOK", fav_artists.get(i).toString());
-                    if (fav_artists.get(i).toString().equals(song[0])) {
+                    if (fav_artists.get(i).toString().equalsIgnoreCase(song[0])) {
                         Log.d("MATCHARTIST", (String) fav_artists.get(i));
-                        if (fav_titles.get(i).toString().equals(song[1])){
+                        if (fav_titles.get(i).toString().equalsIgnoreCase(song[1])){
                             Log.d("FULLMATCH", (String) fav_titles.get(i));
                             index = i;
                         }
