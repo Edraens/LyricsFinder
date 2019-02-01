@@ -37,9 +37,10 @@ public class FavoritesActivity extends AppCompatActivity {
         TextView textEmptyFavs = findViewById(R.id.favorites_text_empty);
         ListView listFavs = findViewById(R.id.favorites_list);
 
-//        Peuplement de l'array avec le JSON de l'historique ou affichage de "historique vide"
+//        Peuplement de l'array avec le JSON de l'historique (récupéré depuis les SharedPreferences) ou affichage de "historique vide"
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (prefs.getString("fav_artists", "[]").equals("[]")) {
+//            Si les favoris sont vides, on cache la ListView et on affiche le texte indiquant qu'il n'y a pas de favs
             listFavs.setVisibility(View.GONE);
             textEmptyFavs.setVisibility(View.VISIBLE);
         } else {
@@ -47,6 +48,7 @@ public class FavoritesActivity extends AppCompatActivity {
 //            Récupération des favoris : artistes
             try {
                 JSONArray favJSONArtists = new JSONArray(prefs.getString("fav_artists", ""));
+//                Peuplement d'un array à partir des données du JSONArray
                 favArrayArtists = new ArrayList<>();
                 for (int i = 0; i < favJSONArtists.length(); i++) {
                     favArrayArtists.add(favJSONArtists.getString(i));
@@ -55,7 +57,7 @@ public class FavoritesActivity extends AppCompatActivity {
                 Log.e("History error", "unable to parse json for artists ");
             }
 
-//            Récupération des favoris : titres
+//            Récupération des favoris : titres (fonctionnement analogue à celui ci-dessus)
             try {
                 JSONArray favJSONTitles = new JSONArray(prefs.getString("fav_titles", ""));
                 favArrayTitles = new ArrayList<>();
@@ -66,7 +68,7 @@ public class FavoritesActivity extends AppCompatActivity {
                 Log.e("History error", "unable to parse json for artists ");
             }
 
-//            Récupération des favoris : paroles
+//            Récupération des favoris : paroles (de même)
             try {
                 JSONArray favJSONLyrics = new JSONArray(prefs.getString("fav_lyrics", ""));
                 favArrayLyrics = new ArrayList<>();
@@ -77,18 +79,20 @@ public class FavoritesActivity extends AppCompatActivity {
                 Log.e("History error", "unable to parse json for artists ");
             }
 
-//            Peuplement de la ListView avec les artistes+titres recherchés dans l'ordre inverse
+//            Peuplement de la ListView avec les artistes + titres des favoris
             ArrayAdapter adapterHistory = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, android.R.id.text1, favArrayArtists) {
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
                     View view = super.getView(position, convertView, parent);
                     TextView text1 = view.findViewById(android.R.id.text1);
 
+//                    Le texte affiché sera sous la forme "Artiste - Titre"
                     text1.setText(favArrayArtists.get(position) + " - " + favArrayTitles.get(position));
                     return view;
                 }
             };
 
+//            Application de l'adapter créé ci-dessus à la ListView des favoris
             listFavs.setAdapter(adapterHistory);
 
 //            Ajout d'un onClickListener pour rendre la ListView clickable

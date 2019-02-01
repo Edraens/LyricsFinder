@@ -85,11 +85,13 @@ public class LyricsActivity extends AppCompatActivity {
 
     }
 
+//    Méthode permettant l'ajout de la chanson actuellement affichée à l'historique
     @SuppressWarnings("Duplicates")
     private void appendHistory() {
         JSONArray history_artists;
         try {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LyricsActivity.this);
+//            Si des titres sont déjà dans l'historique on crée un JSONArray à partir de ce qui existe déjà, sinon on en fait un nouveau
             String raw = prefs.getString("history_artists", "");
             if (raw.equals("")) history_artists = new JSONArray();
             else history_artists = new JSONArray(raw);
@@ -99,6 +101,7 @@ public class LyricsActivity extends AppCompatActivity {
             e.printStackTrace();
             Log.e("History error", "Cannot parse history");
         }
+//        De même pour le titre
         JSONArray history_titles;
         try {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LyricsActivity.this);
@@ -113,6 +116,7 @@ public class LyricsActivity extends AppCompatActivity {
         }
     }
 
+//    Tâche async permettant de récupérer les paroles de la chanson demandée
     @SuppressWarnings("Duplicates")
     private class Request extends AsyncTask<String, Void, String> {
         protected String doInBackground(String... song) {
@@ -139,7 +143,9 @@ public class LyricsActivity extends AppCompatActivity {
                 }
                 JSONObject lyricsJSON = new JSONObject(response.toString());
                 response = new StringBuilder(getLyricsFromJSON(lyricsJSON));
-            } catch (FileNotFoundException e) {
+            }
+//            En cas d'erreur, le code d'erreur est spécifié à la place des paroles
+            catch (FileNotFoundException e) {
                 response = new StringBuilder("404");
             } catch (IOException e) {
                 response = new StringBuilder("noInternet");
@@ -149,6 +155,7 @@ public class LyricsActivity extends AppCompatActivity {
             return response.toString();
         }
 
+//        Les paroles sont contenues dans le string "lyrics" renvoyé par l'API. Extraction :
         private String getLyricsFromJSON(JSONObject jso) throws Exception {
             String response;
             response = jso.getString("lyrics");
@@ -156,6 +163,7 @@ public class LyricsActivity extends AppCompatActivity {
         }
 
         protected void onPostExecute(String result) {
+//            Récupération d'éventuels codes d'erreurs, et affichage de notifications en conséquence pour prévenir l'utilisateur (paroles non trouvées, pas de connexion..)
             if (result.equals("404")) {
                 Toast.makeText(LyricsActivity.this, R.string.lyrics_404, Toast.LENGTH_SHORT).show();
                 LyricsActivity.this.finish();
@@ -167,22 +175,25 @@ public class LyricsActivity extends AppCompatActivity {
                 result = result.replaceAll("\\n\\n\\n+", "\n\n");
                 textLyrics.setText(result);
 
-//                Si l'historique est activé, on ajoute le titre :
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LyricsActivity.this);
-                if (prefs.getBoolean("historyEnabled", true)) {
-//                Si le titre est déjà la dernière entrée dans l'historique, on ajoute pas
+//                Si l'historique est activé et que la chanson n'est PAS en favoris, on voit pour ajouter le titre à l'historique:
+                if (prefs.getBoolean("historyEnabled", true) && !inFavs) {
+//                Si le titre est déjà la dernière entrée dans l'historique, on ajoute pas (pour éviter les doublons)
                     String rawArtists = prefs.getString("history_artists", "");
                     String rawTitles = prefs.getString("history_titles", "");
+//                    Si l'historique est vide, on ajoute
                     if (rawArtists.equals("") || rawTitles.equals("")) {
                         appendHistory();
                     } else {
+//                        Sinon, on vérifie si la chanson n'est pas déjà en dernier dans l'historique
                         try {
 //                        Récupération de l'historique
                             JSONArray history_artists = new JSONArray(rawArtists);
                             JSONArray history_titles = new JSONArray(rawTitles);
 //                        Si le dernier titre de l'historique n'est pas celui qu'on voit actuellement et n'est pas en favoris, alors on l'ajoute. Sinon on fait rien.
                             if (!(history_artists.getString(history_artists.length() - 1).equalsIgnoreCase(song[0]) && history_titles.getString(history_titles.length() - 1).equalsIgnoreCase(song[1]))) {
-                                if (!inFavs) appendHistory();
+//                                Toutes les conditions sont réunies, on déclenche l'ajout
+                                appendHistory();
                             }
                         } catch (JSONException e) {
                             Log.e("JSON", "JSON parse error");
@@ -195,6 +206,7 @@ public class LyricsActivity extends AppCompatActivity {
 
     }
 
+//    Affichage du bouton d'ajout aux favoris si la chanson n'y est pas, ou inversement
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem add = menu.findItem(R.id.menulyrics_add);
@@ -207,6 +219,7 @@ public class LyricsActivity extends AppCompatActivity {
         return true;
     }
 
+//    Création du menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -215,6 +228,7 @@ public class LyricsActivity extends AppCompatActivity {
         return true;
     }
 
+//    Gestion d'un clic sur un item du menu
     @SuppressWarnings("Duplicates")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -225,15 +239,18 @@ public class LyricsActivity extends AppCompatActivity {
                 try {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LyricsActivity.this);
                     String raw = prefs.getString("fav_artists", "");
+//                    Si il n'y a pas de favoris, on créé un nouvel JSONArray, sinon on le créé à partir de ceux existants
                     if (raw.equals("")) fav_artists = new JSONArray();
                     else fav_artists = new JSONArray(raw);
+//                    Ajout de l'artiste au JSONArray
                     fav_artists.put(song[0]);
+//                    Conversion du JSONArray en string pour le stocker dans les SharedPreferences
                     prefs.edit().putString("fav_artists", fav_artists.toString()).apply();
                 } catch (JSONException e) {
                     e.printStackTrace();
                     Log.e("Fav error", "Cannot parse favs");
                 }
-//                Ajout du titre
+//                Ajout du titre (même processus que ci-dessus)
                 JSONArray fav_titles;
                 try {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LyricsActivity.this);
@@ -246,7 +263,7 @@ public class LyricsActivity extends AppCompatActivity {
                     e.printStackTrace();
                     Log.e("Fav error", "Cannot parse favs");
                 }
-//                Ajout des paroles
+//                Ajout des paroles (de même)
                 JSONArray fav_lyrics;
                 try {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LyricsActivity.this);
@@ -259,15 +276,16 @@ public class LyricsActivity extends AppCompatActivity {
                     e.printStackTrace();
                     Log.e("Fav error", "Cannot parse favs");
                 }
-//                Reset du menu
+//                Recréation de l'activité dans le but d'actualiser le bouton du menu
                 recreate();
                 Toast.makeText(this, R.string.favs_add_notification, Toast.LENGTH_SHORT).show();
                 return (true);
+
             case R.id.menulyrics_del:
 //               Récupération de l'id de la chanson dans les array de favoris
                 int index = isInFavorites();
 
-//                Suppression de l'artiste
+//                Suppression de l'artiste à partir de l'index récupéré plus haut
                 JSONArray fav_artists_del;
                 try {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LyricsActivity.this);
@@ -279,7 +297,7 @@ public class LyricsActivity extends AppCompatActivity {
                     e.printStackTrace();
                     Log.e("Fav error", "Cannot parse favs");
                 }
-//                Suppression du titre
+//                Suppression du titre (de même)
                 JSONArray fav_titles_del;
                 try {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LyricsActivity.this);
@@ -291,7 +309,7 @@ public class LyricsActivity extends AppCompatActivity {
                     e.printStackTrace();
                     Log.e("Fav error", "Cannot parse favs");
                 }
-//                Suppression du titre
+//                Suppression des paroles (de même)
                 JSONArray fav_lyrics_del;
                 try {
                     SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(LyricsActivity.this);
@@ -303,7 +321,7 @@ public class LyricsActivity extends AppCompatActivity {
                     e.printStackTrace();
                     Log.e("Fav error", "Cannot parse favs");
                 }
-//                Reset du menu
+//                Recréation de l'activité pour actualiser le menu
                 recreate();
                 Toast.makeText(this, R.string.favs_del_notification, Toast.LENGTH_SHORT).show();
                 return (true);
@@ -314,6 +332,7 @@ public class LyricsActivity extends AppCompatActivity {
         return true;
     }
 
+//    Méthode permettant de récupérer l'index de la chanson dans les tableaux de favoris. Renvoie -1 si la chanson n'est pas en favoris
     @SuppressWarnings("Duplicates")
     private int isInFavorites() {
         int index;
@@ -327,17 +346,13 @@ public class LyricsActivity extends AppCompatActivity {
 //                        Récupération des favoris
                 JSONArray fav_artists = new JSONArray(rawArtists);
                 JSONArray fav_titles = new JSONArray(rawTitles);
-                Log.d("infav? art", fav_artists.toString());
-                Log.d("infav? tit", fav_titles.toString());
                 index = -1;
-                Log.d("MATCH", "looking for matches");
+//                On parcourt le tableau des artistes
                 for (int i = 0; i < fav_artists.length(); i++) {
-                    Log.d("Loop", String.valueOf(i));
-                    Log.d("MATCHLOOK", fav_artists.get(i).toString());
+//                    Si l'artiste de la chanson actuelle correspond à celui de l'index du tableau artistes des favoris, on vérifie si ce même index correspond au titre dans le tableau des titres
                     if (fav_artists.get(i).toString().equalsIgnoreCase(song[0])) {
-                        Log.d("MATCHARTIST", (String) fav_artists.get(i));
                         if (fav_titles.get(i).toString().equalsIgnoreCase(song[1])){
-                            Log.d("FULLMATCH", (String) fav_titles.get(i));
+//                            Si l'artiste et le titre de la chanson sont présents tous les deux au même index des tableaux de favoris, alors la chanson actuelle est en favoris. On retourne donc l'index.
                             index = i;
                         }
                     }

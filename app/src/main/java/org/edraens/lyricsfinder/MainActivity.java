@@ -21,6 +21,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+// L'activity MainActivity affiche les champs de texte correspondant à l'artiste et au titre, ainsi que des suggestions.
+
 public class MainActivity extends AppCompatActivity {
 
     private AutoCompleteTextView inputArtist;
@@ -55,11 +57,11 @@ public class MainActivity extends AppCompatActivity {
         titleSuggestionsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, titleSuggestionsArray);
         inputTitle.setAdapter(titleSuggestionsAdapter);
 
-//        Modification de la sensibilité des AutoCompleteTextView :
+//        Modification de la sensibilité des AutoCompleteTextView (pour afficher plus rapidement les suggestions) :
         inputArtist.setThreshold(0);
         inputTitle.setThreshold(0);
 
-//        Création d'un textChangedListener pour les deux champs de texte afin de n'activer le bouton que si du texte a été entré (via la méthode changeButtonState) et de trigger l'autocompletion :
+//        Création d'un textChangedListener pour les deux champs de texte afin de n'activer le bouton de recherche que si du texte a été entré (via la méthode changeButtonState) et de trigger l'autocompletion :
         inputArtist.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -68,12 +70,14 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                On appelle l'API de suggestions que si il y a plus de deux lettres entrées
                 if (s.length() > 2) {
                     RequestArtist req = new RequestArtist();
                     req.execute(inputArtist.getText().toString());
                 }
                 artistHasText = s.length() > 0;
                 changeButtonState();
+//                Les suggestions de titre sont purgées lorsque l'on change l'artiste
                 titleSuggestionsAdapter.clear();
                 titleSuggestionsAdapter.notifyDataSetChanged();
             }
@@ -92,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+//                Appel de l'API de suggestions si plus d'une lettre est entrée et que le champ artiste n'est pas vide
                 if (s.length() >= 1 && artistHasText) {
                     RequestTitle req = new RequestTitle();
                     req.execute(inputTitle.getText().toString(), inputArtist.getText().toString());
@@ -113,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         else btnSearch.setEnabled(false);
     }
 
+//    Tâche asynchrone récupérant des suggestions d'artistes en fonction de ce qui a déjà été entré auprès de MusicBrainz
     @SuppressWarnings("Duplicates")
     private class RequestArtist extends AsyncTask<String, Void, List<String>> {
         protected List<String> doInBackground(String... artist) {
@@ -137,8 +143,8 @@ public class MainActivity extends AppCompatActivity {
                     rawJson.append(ligne);
                     ligne = bufferedReader.readLine();
                 }
+//                Les données récupérées sont transformées en objet JSON, et le tableau d'artistes en est extrait
                 JSONObject responseJSON = new JSONObject(rawJson.toString());
-//                JSONArray arrayArtistsJSON = new JSONArray(responseJSON.getJSONArray("artists"));
                 JSONArray arrayArtistsJSON = (JSONArray) responseJSON.get("artists");
                 response = getArtistsFromJSON(arrayArtistsJSON);
             } catch (Exception e) {
@@ -147,6 +153,7 @@ public class MainActivity extends AppCompatActivity {
             return response;
         }
 
+//        Méthode permettant de peupler le List de Strings avec l'array JSON récupéré par l'API.
         private List<String> getArtistsFromJSON(JSONArray array) throws Exception {
             List<String> response = new ArrayList<>();
             int limit;
@@ -162,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
             return response;
         }
 
+//        Une fois les suggestions récupérées et placées dans un List, on vide l'Adapter des suggestions, on y ajoute la List et on notifie du changement
         protected void onPostExecute(List<String> result) {
             artistSuggestionsAdapter.clear();
             artistSuggestionsAdapter.addAll(result);
@@ -169,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+//    Fonctionnement identique que RequestArtist, mais pour récupérer les titres liés à l'artiste.
     @SuppressWarnings("Duplicates")
     private class RequestTitle extends AsyncTask<String, Void, List<String>> {
         protected List<String> doInBackground(String... title) {
@@ -231,6 +240,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(lyricsActivity);
     }
 
+//    Création du menu dans l'ActionBar
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -239,6 +249,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+//    Gestion des clics sur les items du menu
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {

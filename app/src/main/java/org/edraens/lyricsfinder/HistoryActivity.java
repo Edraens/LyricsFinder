@@ -39,11 +39,12 @@ public class HistoryActivity extends AppCompatActivity {
 //        Peuplement de l'array avec le JSON de l'historique ou affichage de "historique vide"
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         if (!prefs.contains("history_artists")) {
+//            Si l'historique est vide on affiche un message le notifiant et on cache la ListView
             listHistory.setVisibility(View.GONE);
             textEmptyHistory.setVisibility(View.VISIBLE);
             historyIsEmpty = true;
         } else {
-//            Récupération de l'historique des artistes
+//            Récupération de l'historique des artistes à partir des SharedPreferences et peuplement d'un Array depuis le JSONArray récupéré
             try {
                 JSONArray historyJSONArtists = new JSONArray(prefs.getString("history_artists", ""));
                 listHistoryArrayArtists = new ArrayList<>();
@@ -54,7 +55,7 @@ public class HistoryActivity extends AppCompatActivity {
                 Log.e("History error", "unable to parse json for artists ");
             }
 
-//            Récupération de l'historique des titres
+//            Récupération de l'historique des titres (de même)
             try {
                 JSONArray historyJSONTitles = new JSONArray(prefs.getString("history_titles", ""));
                 listHistoryArrayTitles = new ArrayList<>();
@@ -73,18 +74,20 @@ public class HistoryActivity extends AppCompatActivity {
                     View view = super.getView(position, convertView, parent);
                     TextView text1 = view.findViewById(android.R.id.text1);
 
+//                    Le texte affiché sera sous la forme "Artiste - Titre", et ce dans l'ordre décroissant des index des tableaux : le dernier titre recherché sera tout en haut de la liste affichée
                     text1.setText(listHistoryArrayArtists.get(listHistoryArrayArtists.size()-position-1) + " - " + listHistoryArrayTitles.get(listHistoryArrayTitles.size()-position-1));
                     return view;
                 }
             };
 
+//            Application de l'adapter créé plus haut à la ListView
             listHistory.setAdapter(adapterHistory);
 
 //            Ajout d'un onClickListener pour rendre la ListView clickable
             listHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                    Récupération de l'artiste et du titre associés à l'élément de l'historique
+//                    Récupération de l'artiste et du titre associés à l'élément de l'historique (ne pas oublier que la ListView est affichée dans l'ordre chronologique inverse)
                     String artist = listHistoryArrayArtists.get(listHistoryArrayArtists.size()-position-1);
                     String title = listHistoryArrayTitles.get(listHistoryArrayTitles.size()-position-1);
 //                    Création de l'intent et envoi vers LyricsActivity
@@ -109,6 +112,7 @@ public class HistoryActivity extends AppCompatActivity {
         return true;
     }
 
+//    Création du menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -117,6 +121,7 @@ public class HistoryActivity extends AppCompatActivity {
         return true;
     }
 
+//    Gestion des clics sur un item du menu
     @SuppressWarnings("Duplicates")
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
